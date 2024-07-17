@@ -23,9 +23,10 @@ pipeline {
         stage('Test stage') {
             steps {
                 sh '''
-                #npm test
+                #comment
                 echo 'Test stage'
                 test -f build/index.html
+                npm test
                 '''  
             }
         }
