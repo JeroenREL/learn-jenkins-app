@@ -29,12 +29,17 @@ pipeline {
             }
             steps {
                 sh '''
-                #comment
+                #comment: if you run test stage before build, you need to run 'npm ci' at the start of the test stage!
                 echo 'Test stage'
                 test -f build/index.html
                 npm test
                 '''  
             }
+        }
+    }
+    post{
+        always{
+            junit 'test-results/junit.xml'
         }
     }
 }
