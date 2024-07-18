@@ -47,8 +47,8 @@ pipeline {
             steps {
                 //comment in piepline script
                 sh '''
-                    npm install -g serve
-                    serve -s build
+                    npm install serve
+                    node_modules\.bin\serve.ps1 -s build
                     npx playwright test
                 '''  
             }
