@@ -50,7 +50,7 @@ pipeline {
                     npm install serve
                     node_modules/.bin/serve -s build & #the & makes the server run in the background, so it doesn't block following commands
                     sleep 10 #wait 10 secs for the server to start before starting the PW tests
-                    npx playwright test
+                    npx playwright test --reporter=html
                 '''  
             }
         }
