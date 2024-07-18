@@ -41,7 +41,7 @@ pipeline {
                 }
                 post{
                     always{
-                        junit 'jest-test-results/junit.xml
+                        junit 'jest-test-results/junit.xml'
                     }
                 }
                 stage('E2E Test') {
