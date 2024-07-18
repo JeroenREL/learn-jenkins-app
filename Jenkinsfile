@@ -28,11 +28,28 @@ pipeline {
                 }
             }
             steps {
+                //comment in piepline script
                 sh '''
-                #comment: if you run test stage before build, you need to run 'npm ci' at the start of the test stage!
+                #comment in shell: if you run test stage before build, you need to run 'npm ci' at the start of the test stage!
                 echo 'Test stage'
                 test -f build/index.html
                 npm test
+                '''  
+            }
+        }
+        stage('E2E') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+            steps {
+                //comment in piepline script
+                sh '''
+                    npm install -g serve
+                    serve -s build
+                    npx playwright test
                 '''  
             }
         }
