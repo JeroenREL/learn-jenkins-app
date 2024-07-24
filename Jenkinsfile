@@ -93,9 +93,9 @@ pipeline {
                     # node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json => moved to part of variable script
                     # parse the value from the key 'deploy_url' from the json file by using .../.bin/node-jq
                 '''
-            }
-            script {
+                script {
                 env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
+                }
             }
         }
         stage('Staging E2E Test') {
