@@ -90,9 +90,35 @@ pipeline {
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
                     # without 'prod' flag, folder 'build' will be deployed to local env ~ staging env
-                    node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
+                    # node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json => moved to part of variable script
                     # parse the value from the key 'deploy_url' from the json file by using .../.bin/node-jq
                 '''
+            }
+            scrpit {
+                env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
+            }
+        }
+        stage('Staging E2E Test') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+            environment {
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+            }
+            steps {
+                //comment in pipeline script
+                sh '''
+                    npx playwright test --reporter=html
+                '''  
+            }
+            post{
+                always{
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Staging E2E', reportTitles: '', useWrapperFileDirectly: true])
+                    //pipeline script to publish html reports generated in jenkins (pipeline - pipeline syntax)
+                }
             }
         }
         stage('Approval') {
@@ -138,7 +164,7 @@ pipeline {
             }
             post{
                 always{
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E', reportTitles: '', useWrapperFileDirectly: true])
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Production E2E', reportTitles: '', useWrapperFileDirectly: true])
                     //pipeline script to publish html reports generated in jenkins (pipeline - pipeline syntax)
                 }
             }
