@@ -52,7 +52,7 @@ pipeline {
                         }
                     }
                     steps {
-                        //comment in piepline script
+                        //comment in pipeline script
                         sh '''
                             npm install serve
                             node_modules/.bin/serve -s build & #the & makes the server run in the background, so it doesn't block following commands
@@ -78,12 +78,8 @@ pipeline {
             }
             steps {
                 sh '''
-                    ls -la
-                    node --version
-                    npm --version
-                    npm ci
-                    npm run build
-                    ls -la
+                    npm install netlify-cli -g
+                    netlify --version
                 '''
             }
         }
