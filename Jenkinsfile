@@ -75,14 +75,15 @@ pipeline {
                 }
             }
         }
-        stage('Deploy staging') {
+        stage('Staging deploy & test') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
             }
             steps {
+                //comment in pipeline script
                 sh '''
                     npm install netlify-cli node-jq
                     node_modules/.bin/netlify --version
@@ -90,24 +91,14 @@ pipeline {
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
                     # without 'prod' flag, folder 'build' will be deployed to local env ~ staging env
-                    # node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json => moved to part of variable script
+                    CI_ENVIRONMENT_URL=$(
+                    node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
+                    )
+                    # => part within parenthesis (now stored to the  var**) was moved moved to part of variable script
+                    # **(only accessible in the 'sh' block)
+                    # => that was when stage deploy and stage test were still two separate stages!
+                    # => they were 'merged' later on
                     # parse the value from the key 'deploy_url' from the json file by using .../.bin/node-jq
-                '''
-            }
-        }
-        stage('Staging E2E Test') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    reuseNode true
-                }
-            }
-            environment {
-                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
-            }
-            steps {
-                //comment in pipeline script
-                sh '''
                     npx playwright test --reporter=html
                 '''  
             }
