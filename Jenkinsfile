@@ -94,7 +94,7 @@ pipeline {
                     # parse the value from the key 'deploy_url' from the json file by using .../.bin/node-jq
                 '''
             }
-            scrpit {
+            script {
                 env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
             }
         }
