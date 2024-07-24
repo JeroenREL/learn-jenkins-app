@@ -82,6 +82,10 @@ pipeline {
                     reuseNode true
                 }
             }
+            environment {
+                CI_ENVIRONMENT_URL = 'STAGING_URL_TO_BE_SET'
+                //initialize var so that playwright sees it (and uses this var iso localhost:3000 - see config) 
+            }
             steps {
                 //comment in pipeline script
                 sh '''
