@@ -4,7 +4,8 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = 'c48b3e51-a0ac-42e3-96b9-a401d1dc4a4c'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
-        //variable names have to be correct, so Neltify recognizes it
+        //variable names have to be correct, so Netlify recognizes it
+        REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
 
     stages {
@@ -58,7 +59,6 @@ pipeline {
                         }
                     }
                     steps {
-                        //comment in pipeline script
                         sh '''
                             npm install serve
                             node_modules/.bin/serve -s build & #the & makes the server run in the background, so it doesn't block following commands
@@ -87,7 +87,6 @@ pipeline {
                 //initialize var so that playwright sees it (and uses this var iso localhost:3000 - see config) 
             }
             steps {
-                //comment in pipeline script
                 sh '''
                     npm install netlify-cli node-jq
                     node_modules/.bin/netlify --version
@@ -113,13 +112,13 @@ pipeline {
                 }
             }
         }
-        stage('Approval') {
-            steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    input 'Ready to deploy?'
-                }
-            }
-        }
+        // stage('Approval') {
+        //     steps {
+        //         timeout(time: 15, unit: 'MINUTES') {
+        //             input 'Ready to deploy?'
+        //         }
+        //     }
+        // }
         // stage('Deploy prod') {
         //     agent {
         //         docker {
@@ -149,7 +148,6 @@ pipeline {
                 CI_ENVIRONMENT_URL = 'https://bright-cuchufli-33b1f5.netlify.app'
             }
             steps {
-                //comment in pipeline script
                 sh '''
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
