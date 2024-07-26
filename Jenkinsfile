@@ -9,6 +9,14 @@ pipeline {
     }
 
     stages {
+        stage('Docker') {
+            steps {
+                sh 'docker build -t my-playwright .'
+                //"-t my-playwright" assigns the tag "my-playwright" ot the build
+                //"." says that it can be found in this current location / root of this project (general Linux command)
+            }
+        }
+
         stage('Build') {
             agent {
                 docker {
@@ -78,7 +86,8 @@ pipeline {
         stage('Staging deploy & test') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    image 'my-playwright'
+                    //original img "mcr.microsoft.com/playwright:v1.39.0-jammy" is now defined in docker img "my-playwright" 
                     reuseNode true
                 }
             }
@@ -88,11 +97,17 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install netlify-cli node-jq
-                    node_modules/.bin/netlify --version
+                    #npm install netlify-cli node-jq
+                    #=> part of docker build now
+                    #node_modules/.bin/netlify --version
+                    netlify --version
+                    #full path no longer needed: see below
                     echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
+                    #node_modules/.bin/netlify status
+                    netlify status
+                    #node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
+                    netlify deploy --dir=build --json > deploy-output.json
+                    #full path no longer needed, since it is in docker build, which refers to the root of this project
                     # without 'prod' flag, folder 'build' will be deployed to local env ~ staging env
                     CI_ENVIRONMENT_URL=$(
                     node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
@@ -140,7 +155,9 @@ pipeline {
         stage('Prod deploy & test') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    //now part of docker build img "my-playwright"
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
@@ -149,12 +166,14 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install netlify-cli
-                    node_modules/.bin/netlify --version
+                    #npm install netlify-cli
+                    #=>docker
+                    netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --prod
+                    netlify status
+                    netlify deploy --dir=build --prod
                     # deploy the folder 'build' to production
+                    # simpler paths due to docker img (see also staging build stage)
                     npx playwright test --reporter=html
                 '''  
             }
