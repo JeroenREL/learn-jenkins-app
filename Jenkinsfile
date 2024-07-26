@@ -62,14 +62,18 @@ pipeline {
                 stage('E2E Test') {
                     agent {
                         docker {
-                            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            //image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            image 'my-playwright'
+                            // img changed due to use of custom docker image
                             reuseNode true
                         }
                     }
                     steps {
                         sh '''
-                            npm install serve
-                            node_modules/.bin/serve -s build & #the & makes the server run in the background, so it doesn't block following commands
+                            #npm install serve
+                            #=> now in custom docker img
+                            serve -s build & #the & makes the server run in the background, so it doesn't block following commands
+                            # original path "node_modules/.bin/serve -s ..." now simpler due to custom docker img build
                             sleep 10 #wait 10 secs for the server to start before starting the PW tests
                             npx playwright test --reporter=html
                         '''  
