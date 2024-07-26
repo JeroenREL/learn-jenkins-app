@@ -9,14 +9,14 @@ pipeline {
     }
 
     stages {
-        stage('Docker') {
-            steps {
-                sh 'docker build -t my-playwright .'
-                //"-t my-playwright" assigns the tag "my-playwright" ot the build
-                //"." says that it can be found in this current location / root of this project (general Linux command)
-            }
-        }
-
+        // stage('Docker') {
+        //     steps {
+        //         sh 'docker build -t my-playwright .'
+        //         //"-t my-playwright" assigns the tag "my-playwright" ot the build
+        //         //"." says that it can be found in this current location / root of this project (general Linux command)
+        //     }
+        // }
+        // docker build stage removed: defined in Jenkins-nightly file now
         stage('Build') {
             agent {
                 docker {
