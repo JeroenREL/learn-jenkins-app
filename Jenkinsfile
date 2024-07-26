@@ -110,7 +110,9 @@ pipeline {
                     #full path no longer needed, since it is in docker build, which refers to the root of this project
                     # without 'prod' flag, folder 'build' will be deployed to local env ~ staging env
                     CI_ENVIRONMENT_URL=$(
-                    node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
+                    #node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
+                    node-jq -r '.deploy_url' deploy-output.json
+                    #simpler path due to docker build
                     )
                     # => part within parenthesis (now stored to the  var**) was moved moved to part of variable script
                     # **(only accessible in the 'sh' block)
